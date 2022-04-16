@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-// The Ranges struct specifies the loop range that a particular worker
+// Ranges specifies the loop range that a particular worker
 // will operate on. For example, if we wish to compute a julia set function and increase its cReal
 // until it is 0.25 greater than its initial value (so as to animate the set),
 // and we increment the cReal each time by some constant value such as 0.1 (to control the speed of the animation),
@@ -58,6 +58,7 @@ type Worker struct {
 	imageNumberIndex int
 	index            int // use zero value
 	amount           int
+	ffmpegChan       chan ImageInput
 }
 
 // WorkerPoolConstructor is a utility type for creating worker pools which
@@ -71,14 +72,18 @@ type WorkerPoolConstructor struct {
 	CameraModifiers
 }
 
-func (w WorkerPoolConstructor) CreateWorkerPool() []Worker {
+func (w WorkerPoolConstructor) CreateWorkerPool(ffmpeg ...*ImageProcessor) []Worker {
 	var workers []Worker
 	totalItems := math.Ceil(w.endRange / w.increment)
 	workItemsPerWorker := int(totalItems) / w.WorkerCount
+	if len(ffmpeg) == 1 {
+		ffmpeg[0].ExpectedReceives = int(totalItems)
+		go ffmpeg[0].processVideo()
+	}
 	for i := 0; i < w.WorkerCount; i++ {
 		workerBeginOffset := float64(i) * (float64(workItemsPerWorker))
 		workerEndOffset := float64(i+1) * (float64(workItemsPerWorker))
-		workers = append(workers, Worker{
+		worker := Worker{
 			ID:               i,
 			InitialCondition: w.InitialCondition,
 			Ranges: Ranges{
@@ -91,7 +96,11 @@ func (w WorkerPoolConstructor) CreateWorkerPool() []Worker {
 			imageNumberIndex: int(workerBeginOffset),
 			index:            0,
 			amount:           workItemsPerWorker,
-		})
+		}
+		if len(ffmpeg) == 1 {
+			worker.ffmpegChan = ffmpeg[0].Input
+		}
+		workers = append(workers, worker)
 	}
 	return workers
 }
@@ -124,7 +133,9 @@ func (w *Worker) CreateJuliaSetImage() {
 			w.zoom,
 			w.moveX,
 			w.moveY,
+			w.imageNumberIndex+k,
 			GetImageFilePath(w.imageNumberIndex+k),
+			w.ffmpegChan,
 		)
 		w.index++
 		k++
