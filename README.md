@@ -52,7 +52,7 @@ some mapping (function).
 
 Julia set's are an interesting view into fractals and how mathematics and art can intersect. Even without an in depth 
 appreciation for the mathematics at play, almost everyone can appreciate the resulting images / videos. Here are some examples,
-
+![](./julia-gif.gif)
 ![example 1](./example-1.png)
 ![example 2](./example-2.png)
 ![example 3](./example-3.png)
