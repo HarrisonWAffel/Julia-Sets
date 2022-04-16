@@ -1,11 +1,13 @@
 ## Julia Set Generator Written In Golang 
 
 This is a simple (naive) Julia Set generator written in Golang. The project utilizes concurrent workers to speed up processing speed. This project 
-automatically generate an mp4 video using FFmpeg showing an animated julia set.
+automatically generates an mp4 video using FFmpeg showing an animated julia set.
 
 ### Dependencies 
 FFMPEG - video processing tool which can produce a video from a set of images
+
 github.com/muesli/gamut - for generating color pallets.
+
 github.com/u2takey/ffmpeg-go - for converting images into mp4's on the fly
 
 ### Needed Improvements
