@@ -6,22 +6,17 @@ import (
 )
 
 func run() {
-	constructor, isWindows := flags()
-	if !isWindows {
-		ctx, cancel := context.WithCancel(context.Background())
-		ffmpegProcessor := ImageProcessor{
-			Input:  make(chan ImageInput),
-			endCtx: cancel,
-		}
-		StartWorkers(constructor.CreateWorkerPool(&ffmpegProcessor))
-		<-ctx.Done()
-	} else {
-		StartWorkers(constructor.CreateWorkerPool())
+	constructor := flags()
+	ctx, cancel := context.WithCancel(context.Background())
+	ffmpegProcessor := ImageProcessor{
+		Input:  make(chan ImageInput),
+		endCtx: cancel,
 	}
+	StartWorkers(constructor.CreateWorkerPool(&ffmpegProcessor))
+	<-ctx.Done()
 }
 
-func flags() (WorkerPoolConstructor, bool) {
-	isWindows := flag.Bool("windows", false, "underlying OS is Windows (default: false)")
+func flags() WorkerPoolConstructor {
 	width := flag.Int("image-width", 1600, "width of resulting video or images")
 	height := flag.Int("image-height", 1600, "height of resulting video or images")
 	workerCount := flag.Int("worker-count", 2, "number of threads to use")
@@ -46,5 +41,5 @@ func flags() (WorkerPoolConstructor, bool) {
 		CameraModifiers: CameraModifiers{
 			zoom: *zoom,
 		},
-	}, *isWindows
+	}
 }

@@ -49,7 +49,7 @@ func main() {
 			moveY: moveY,
 		},
 	}
-	// todo; test on windows. possible switch on windows to legacy processing (write to fs, manually run ffmpeg)
+
 	ctx, cancel := context.WithCancel(context.Background())
 	ffmpegProcessor := ImageProcessor{
 		Input:  make(chan ImageInput),

@@ -48,12 +48,17 @@ func (b *ImageProcessor) processVideo() {
 	}
 
 	if ffmpeg.Input("pipe:").
-		Output("juliaSet.mp4").
+		Output("juliaSet.mp4", ffmpeg.KwArgs{
+			"c:v":     "libx264",
+			"pix_fmt": "yuv420p",
+		}).
 		OverWriteOutput().
+		ErrorToStdOut().
 		WithInput(bytes.NewReader(i.Bytes())).
 		Run() != nil {
 		panic("error running FFMPEG")
 	}
+
 	fmt.Println("video generated!")
 	os.Exit(0)
 }

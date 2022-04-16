@@ -1,7 +1,7 @@
 ## Julia Set Generator Written In Golang 
 
 This is a simple (naive) Julia Set generator written in Golang. The project utilizes concurrent workers to speed up processing speed. This project 
-either automatically generates an mp4 video (if run on Mac) or creates a set of png images which can be used by Ffmpeg to create an mp4 video (if run on windows) showing an animated julia set.
+automatically generate an mp4 video using FFmpeg showing an animated julia set.
 
 ### Dependencies 
 FFMPEG - video processing tool which can produce a video from a set of images
@@ -23,22 +23,12 @@ Different julia sets can be created by using different values for the constant r
 
 additional values can be found on various sites, such as wikipedia. 
 
-
 ### Tips And Tricks
   + The smaller the increment, the slower the animation
   + Each worker occupies one logical CPU core, an excessively large number of workers saturates the CPU and will slow down performance
   + Frame size directly correlates to the amount of work required, if you have performance problems consider a smaller frame size (default is 1600x1600).
-    + square frame sizes get the best results
-
-### How to create a video of a julia set on Windows
-
-in essence, video frames. Using this repository on Mac will automatically convert the frames into a video. 
-Using this repository on a windows machine will create a set of png's, to produce an actual mp4
-you can use the following FFMPEG command.
-Ensure that you run these commands within the repository.
-These commands could likely be improved to provide greater image quality and better compression.
-
-Windows: `ffmpeg -framerate 30 -i img%04d.png -c:v libx264 -pix_fmt yuv420p out.mp4`
+    + square frame sizes are required
+  + run the command with no arguments to get a default video
 
 ### What is a julia set?
 
@@ -52,8 +42,7 @@ some mapping (function).
 ```
 
 Julia set's are an interesting view into fractals and how mathematics and art can intersect. Even without an in depth 
-appreciation for the mathematics at play, almost everyone can appreciate the resulting images / videos. Here are some examples, 
-
+appreciation for the mathematics at play, almost everyone can appreciate the resulting images / videos. Here are some examples,
 
 ![example 1](./example-1.png)
 ![example 2](./example-2.png)
