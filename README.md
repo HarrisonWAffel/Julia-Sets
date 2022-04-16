@@ -29,6 +29,13 @@ additional values can be found on various sites, such as wikipedia.
   + Frame size directly correlates to the amount of work required, if you have performance problems consider a smaller frame size (default is 1600x1600).
     + square frame sizes are required
   + run the command with no arguments to get a default video
+  + If you want to create really long or detailed animations, and do not have sufficient RAM you can pass the `-manual` flag
+    + All png's will be placed in ./movie 
+    + you can convert the images into an mp4 with the following commands 
+      + Windows 
+        + `ffmpeg -framerate 30 -i img%04d.png -c:v libx264 -pix_fmt yuv420p out.mp4`
+      + Mac
+        + `ffmpeg -framerate 30 -pattern_type glob -i '*.png' -c:v libx264 -pix_fmt yuv420p out.mp4`
 
 ### What is a julia set?
 

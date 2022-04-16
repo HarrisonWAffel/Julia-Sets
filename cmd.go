@@ -6,17 +6,21 @@ import (
 )
 
 func run() {
-	constructor := flags()
-	ctx, cancel := context.WithCancel(context.Background())
-	ffmpegProcessor := ImageProcessor{
-		Input:  make(chan ImageInput),
-		endCtx: cancel,
+	constructor, manual := flags()
+	if !manual {
+		ctx, cancel := context.WithCancel(context.Background())
+		ffmpegProcessor := ImageProcessor{
+			Input:  make(chan ImageInput),
+			endCtx: cancel,
+		}
+		StartWorkers(constructor.CreateWorkerPool(&ffmpegProcessor))
+		<-ctx.Done()
+	} else {
+		StartWorkers(constructor.CreateWorkerPool())
 	}
-	StartWorkers(constructor.CreateWorkerPool(&ffmpegProcessor))
-	<-ctx.Done()
 }
 
-func flags() WorkerPoolConstructor {
+func flags() (WorkerPoolConstructor, bool) {
 	width := flag.Int("image-width", 1600, "width of resulting video or images")
 	height := flag.Int("image-height", 1600, "height of resulting video or images")
 	workerCount := flag.Int("worker-count", 2, "number of threads to use")
@@ -25,6 +29,7 @@ func flags() WorkerPoolConstructor {
 	endRange := flag.Float64("end-range", 0.005, "worker loop range")
 	increment := flag.Float64("increment", 0.0001, "loop increment (smaller is slower, larger is faster)")
 	zoom := flag.Float64("zoom", 1., "zoom value")
+	manual := flag.Bool("manual", false, "generate a set of png's and manually convert them yourself")
 	flag.Parse()
 	return WorkerPoolConstructor{
 		WorkerCount: *workerCount,
@@ -41,5 +46,5 @@ func flags() WorkerPoolConstructor {
 		CameraModifiers: CameraModifiers{
 			zoom: *zoom,
 		},
-	}
+	}, *manual
 }
